@@ -1,111 +1,168 @@
+<?php
+session_start();
+if(isset($_SESSION["uid"])){
+	header("location:profile.php");
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
-    <?php
-    session_start();
-    include('header.php');
-    include('admin/db_connect.php');
-
-	$query = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
-	foreach ($query as $key => $value) {
-		if(!is_numeric($key))
-			$_SESSION['setting_'.$key] = $value;
-	}
-    ?>
-
-    <style>
-    	header.masthead {
-		  background: url(assets/img/<?php echo $_SESSION['setting_cover_img'] ?>);
-		  background-repeat: no-repeat;
-		  background-size: cover;
-		}
-    </style>
-    <body id="page-top">
-        <!-- Navigation-->
-        <div class="toast" id="alert_toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body text-white">
-        </div>
-      </div>
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
-            <div class="container">
-                <a class="navbar-brand js-scroll-trigger" href="./"><?php echo $_SESSION['setting_name'] ?></a>
-                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ml-auto my-2 my-lg-0">
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=home">Home</a></li>
-
-  
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=cart_list"><span> <span class="badge badge-danger item_count">0</span> <i class="fa fa-shopping-cart"></i>  </span>Cart</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=about">About</a></li>
-                        <?php if(isset($_SESSION['login_user_id'])): ?>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="admin/ajax.php?action=logout2"><?php echo "Welcome ". $_SESSION['login_first_name'].' '.$_SESSION['login_last_name'] ?> <i class="fa fa-power-off"></i></a></li>
-                      <?php else: ?>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="javascript:void(0)" id="login_now">Login</a></li>
-                      <?php endif; ?>
-                      <li class="nav-item"><a class="nav-link js-scroll-trigger" href="admin/index.php?page=home">Admin</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        
-       
-        <?php 
-        $page = isset($_GET['page']) ?$_GET['page'] : "home";
-        include $page.'.php';
-        ?>
-       
-
-<div class="modal fade" id="confirm_modal" role='dialog'>
-    <div class="modal-dialog modal-md" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title">Confirmation</h5>
-      </div>
-      <div class="modal-body">
-        <div id="delete_content"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id='confirm' onclick="">Continue</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="uni_modal" role='dialog'>
-    <div class="modal-dialog modal-md" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title"></h5>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="uni_modal_right" role='dialog'>
-    <div class="modal-dialog modal-full-height  modal-md" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title"></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span class="fa fa-arrow-righ t"></span>
-        </button>
-      </div>
-      <div class="modal-body">
-      </div>
-      </div>
-    </div>
-  </div>
-        <footer class="bg-light py-5">
-            <div class="container"><div class="small text-center text-muted">Copyright © 2021 - University Food Ordering system | </div></div>
-        </footer>
-        
-       <?php include('footer.php') ?>
-    </body>
-
-    <?php $conn->close() ?>
-
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>jchesoni Store</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css"/>
+		<script src="js/jquery2.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="main.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<style></style>
+	</head>
+<body>
+<div class="wait overlay">
+	<div class="loader"></div>
+</div>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">	
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse" aria-expanded="false">
+					<span class="sr-only">navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a href="#" class="navbar-brand">jchesoni Store</a>
+			</div>
+		<div class="collapse navbar-collapse" id="collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="index.php"><span class="glyphicon glyphicon-home"></span>Home</a></li>
+				<li><a href="index.php"><span class="glyphicon glyphicon-modal-window"></span>Tractors</a></li>
+			</ul>
+			<form class="navbar-form navbar-left">
+		        <div class="form-group">
+		          <input type="text" class="form-control" placeholder="Search" id="search">
+		        </div>
+		        <button type="submit" class="btn btn-primary" id="search_btn"><span class="glyphicon glyphicon-search"></span></button>
+		     </form>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-shopping-cart"></span>Cart<span class="badge">0</span></a>
+					<div class="dropdown-menu" style="width:400px;">
+						<div class="panel panel-success">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-md-3">Sl.No</div>
+									<div class="col-md-3">Product Image</div>
+									<div class="col-md-3">Product Name</div>
+									<div class="col-md-3">Price in $.</div>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div id="cart_product">
+								</div>
+							</div>
+							<div class="panel-footer"></div>
+						</div>
+					</div>
+				</li>
+				<li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span>SignIn</a>
+					<ul class="dropdown-menu">
+						<div style="width:300px;">
+							<div class="panel panel-primary">
+								<div class="panel-heading">Login</div>
+								<div class="panel-heading">
+									<form onsubmit="return false" id="login">
+										<label for="email">Email</label>
+										<input type="email" class="form-control" name="email" id="email" required/>
+										<label for="email">Password</label>
+										<input type="password" class="form-control" name="password" id="password" required/>
+										<p><br/></p>
+										<a href="#" style="color:white; list-style:none;">Forgotten Password</a><input type="submit" class="btn btn-success" style="float:right;">
+									</form>
+								</div>
+								<div class="panel-footer" id="e_msg"></div>
+							</div>
+						</div>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>	
+	<p><br/></p>
+	<p><br/></p>
+	<p><br/></p>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-2 col-xs-12">
+				<div id="get_category">
+				</div>
+				<div id="get_brand">
+				</div>
+			</div>
+			<div class="col-md-8 col-xs-12">
+				<div class="row">
+					<div class="col-md-12 col-xs-12" id="product_msg">
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">Tractors</div>
+					<div class="panel-body">
+						<div id="get_product">
+							<!--Here we get product jquery Ajax Request-->
+						</div>
+					</div>
+					<div class="panel-footer">&copy; 2019</div>
+				</div>
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+	</div>
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
